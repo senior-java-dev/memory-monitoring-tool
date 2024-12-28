@@ -6,6 +6,8 @@ import java.lang.management.MemoryUsage;
 
 import org.springframework.stereotype.Service;
 
+import com.jvsnr.util.MemoryUtils;
+
 @Service
 public class MemoryMonitorService {
     
@@ -14,9 +16,9 @@ public class MemoryMonitorService {
      * 
      * @return heap memory usage in bytes
      */
-    public long getHeapMemoryUsage() {
+    public String getHeapMemoryUsage() {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return memoryPoolMXBean.getHeapMemoryUsage().getUsed();
+        return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getUsed());
     }
 
     /**
@@ -24,9 +26,9 @@ public class MemoryMonitorService {
      * 
      * @return non heap memory usage in bytes
      */
-    public long getNonHeapMemoryUsage() {
+    public String getNonHeapMemoryUsage() {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return memoryPoolMXBean.getNonHeapMemoryUsage().getUsed();
+        return MemoryUtils.formatBytes(memoryPoolMXBean.getNonHeapMemoryUsage().getUsed());
     }
 
     /*
@@ -34,9 +36,9 @@ public class MemoryMonitorService {
      * 
      * @return heap memory max in bytes
      */
-    public long getHeapMemoryMax() {
+    public String getHeapMemoryMax() {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return memoryPoolMXBean.getHeapMemoryUsage().getMax();
+        return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getMax());
     }
 
     /*
@@ -44,9 +46,9 @@ public class MemoryMonitorService {
      * 
      * @return heap memory committed in bytes
      */
-    public long getHeapMemoryCommitted() {
+    public String getHeapMemoryCommitted() {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return memoryPoolMXBean.getHeapMemoryUsage().getCommitted();
+        return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getCommitted());
     }
 
     /**
@@ -54,12 +56,13 @@ public class MemoryMonitorService {
      * 
      * @return memory utilisation in percentage
      */
-    public double getMemoryUtilisation() {
+    public String getMemoryUtilisation() {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
-        long used = getHeapMemoryUsage();
+        long used = heapMemoryUsage.getUsed();
         long max = heapMemoryUsage.getMax();
-        return ((double) used / max) * 100;
+        float percentage = ((float) used / max) * 100;
+        return Double.toString(percentage);
     }
 
 }

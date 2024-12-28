@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemoryMetricsDTO {
-    private long heapMemoryUsage;
-    private long nonHeapMemoryUsage;
-    private long heapMemoryMax;
-    private long heapMemoryCommitted;
-    private double memoryUtilisation;
+    private String heapMemoryUsage;
+    private String nonHeapMemoryUsage;
+    private String heapMemoryMax;
+    private String heapMemoryCommitted;
+    private String memoryUtilisation;
 }

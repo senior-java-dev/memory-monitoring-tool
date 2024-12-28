@@ -1,4 +1,4 @@
-package com.jvsnr.memory_monitoring_tool.dto.controller;
+package com.jvsnr.memory_monitoring_tool.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
