@@ -95,8 +95,8 @@ public class GarbageCollectionMonitorService {
      *
      * @return the last GC info
      */
-    public Map<String, GarbageCollectionMetricsDTO> getLastGCInfo() {
-        return new HashMap<>(garbageCollectionMetrics);
+    public GarbageCollectionMetricsDTO getLastGCInfo() {
+        return garbageCollectionMetrics.values().stream().findFirst().orElse(null);
     }
 
     /**
