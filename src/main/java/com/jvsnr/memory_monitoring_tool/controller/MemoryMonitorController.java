@@ -20,28 +20,28 @@ public class MemoryMonitorController {
     @GetMapping("/heap-memory")
     public MemoryMetricsDTO getHeapMemoryMetrics() {
         MemoryMetricsDTO memoryMetricsDTO = new MemoryMetricsDTO();
-        memoryMetricsDTO.setHeapMemoryUsage(memoryMonitorService.getHeapMemoryUsage());
+        memoryMetricsDTO.setHeapMemoryUsage(memoryMonitorService.getHeapMemoryUsage(true));
         return memoryMetricsDTO;
     } 
 
     @GetMapping("/non-heap-memory")
     public MemoryMetricsDTO getNonHeapMemoryMetrics() {
         MemoryMetricsDTO memoryMetricsDTO = new MemoryMetricsDTO();
-        memoryMetricsDTO.setNonHeapMemoryUsage(memoryMonitorService.getNonHeapMemoryUsage());
+        memoryMetricsDTO.setNonHeapMemoryUsage(memoryMonitorService.getNonHeapMemoryUsage(true));
         return memoryMetricsDTO;
     }
 
     @GetMapping("/heap-memory-max")
     public MemoryMetricsDTO getHeapMemoryMaxMetrics() {
         MemoryMetricsDTO memoryMetricsDTO = new MemoryMetricsDTO();
-        memoryMetricsDTO.setHeapMemoryMax(memoryMonitorService.getHeapMemoryMax());
+        memoryMetricsDTO.setHeapMemoryMax(memoryMonitorService.getHeapMemoryMax (true));
         return memoryMetricsDTO;
     }
 
     @GetMapping("/heap-memory-committed")
     public MemoryMetricsDTO getHeapMemoryCommittedMetrics() {
         MemoryMetricsDTO memoryMetricsDTO = new MemoryMetricsDTO();
-        memoryMetricsDTO.setHeapMemoryCommitted(memoryMonitorService.getHeapMemoryCommitted());
+        memoryMetricsDTO.setHeapMemoryCommitted(memoryMonitorService.getHeapMemoryCommitted(true));
         return memoryMetricsDTO;
     }
 
@@ -55,10 +55,10 @@ public class MemoryMonitorController {
     @GetMapping("/all")
     public MemoryMetricsDTO getAllMetrics() {
         MemoryMetricsDTO memoryMetricsDTO = new MemoryMetricsDTO();
-        memoryMetricsDTO.setHeapMemoryUsage(memoryMonitorService.getHeapMemoryUsage());
-        memoryMetricsDTO.setNonHeapMemoryUsage(memoryMonitorService.getNonHeapMemoryUsage());
-        memoryMetricsDTO.setHeapMemoryMax(memoryMonitorService.getHeapMemoryMax());
-        memoryMetricsDTO.setHeapMemoryCommitted(memoryMonitorService.getHeapMemoryCommitted());
+        memoryMetricsDTO.setHeapMemoryUsage(memoryMonitorService.getHeapMemoryUsage(true));
+        memoryMetricsDTO.setNonHeapMemoryUsage(memoryMonitorService.getNonHeapMemoryUsage(true));
+        memoryMetricsDTO.setHeapMemoryMax(memoryMonitorService.getHeapMemoryMax(true));
+        memoryMetricsDTO.setHeapMemoryCommitted(memoryMonitorService.getHeapMemoryCommitted(true));
         memoryMetricsDTO.setMemoryUtilisation(memoryMonitorService.getMemoryUtilisation());
         return memoryMetricsDTO;
     }

@@ -14,41 +14,61 @@ public class MemoryMonitorService {
     /**
      * get heap memory usage
      * 
+     * @param formatted if true, return formatted bytes
      * @return heap memory usage in bytes
      */
-    public String getHeapMemoryUsage() {
+    public String getHeapMemoryUsage(boolean formatted) {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getUsed());
+        if (formatted) {
+            return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getUsed());
+        } else {
+            return String.valueOf(memoryPoolMXBean.getHeapMemoryUsage().getUsed());
+        }
     }
 
     /**
      * get non heap memory usage
      * 
+     * @param formatted if true, return formatted bytes
      * @return non heap memory usage in bytes
      */
-    public String getNonHeapMemoryUsage() {
+    public String getNonHeapMemoryUsage(boolean formatted) {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return MemoryUtils.formatBytes(memoryPoolMXBean.getNonHeapMemoryUsage().getUsed());
+        if (formatted) {
+            return MemoryUtils.formatBytes(memoryPoolMXBean.getNonHeapMemoryUsage().getUsed());
+        } else {
+            return String.valueOf(memoryPoolMXBean.getNonHeapMemoryUsage().getUsed());
+        }
     }
 
-    /*
+    /**
      * get heap memory max
      * 
+     * @param formatted if true, return formatted bytes
      * @return heap memory max in bytes
      */
-    public String getHeapMemoryMax() {
+    public String getHeapMemoryMax(boolean formatted) {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getMax());
+        if (formatted) {
+            return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getMax());
+        } else {
+            return String.valueOf(memoryPoolMXBean.getHeapMemoryUsage().getMax());
+        }
     }
 
-    /*
+    /**
      * get heap memory committed
      * 
+     * @param formatted if true, return formatted bytes
      * @return heap memory committed in bytes
      */
-    public String getHeapMemoryCommitted() {
+    public String getHeapMemoryCommitted(boolean formatted) {
         MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
-        return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getCommitted());
+        if (formatted) {
+            return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getCommitted());
+        } else {
+            return String.valueOf(memoryPoolMXBean.getHeapMemoryUsage().getCommitted());
+        }
     }
 
     /**
