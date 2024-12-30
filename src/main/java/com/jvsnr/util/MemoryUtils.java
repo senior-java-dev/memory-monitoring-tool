@@ -1,5 +1,7 @@
 package com.jvsnr.util;
 
+import java.util.Date;
+
 public class MemoryUtils {
     
     /**
@@ -18,6 +20,24 @@ public class MemoryUtils {
         } else {
             return String.format("%.2f GB", (double) bytes / Math.pow(1024, 3));
         }
+    }
+
+    public static long nullifyNegativeToZero(Long value) {
+        if (value < 0) {
+            return 0L;
+        }
+        return value;
+    }
+
+    public static String formatTime(long milliseconds) {
+        if (milliseconds < 1000) {
+            return milliseconds + "ms";
+        }
+        return String.format("%.2fs", milliseconds / 1000.0);
+    }
+
+    public static String formatDateTime(long time) {
+        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time));
     }
 
 }
