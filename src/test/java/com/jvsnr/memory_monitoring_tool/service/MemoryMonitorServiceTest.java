@@ -29,7 +29,7 @@ public class MemoryMonitorServiceTest {
     @Test
     void getHeapMemoryUsage_WhenFormatted_ShouldReturnFormattedValue() {
         // Given
-        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * 1024 * 1024L, 1024 * 1024 * 1024L, 2048 * 1024 * 1024L);
+        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * (long) Math.pow(1024, 2), (long) Math.pow(1024, 3), (long) Math.pow(1024, 3));
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
         // When
@@ -43,7 +43,7 @@ public class MemoryMonitorServiceTest {
     void getHeapMemoryUsage_WhenNotFormatted_ShouldReturnRawValue() {
         // Given
         long expected = 500 * 1024 * 1024L;
-        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, expected, 1024 * 1024 * 1024L, 2048 * 1024 * 1024L);
+        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, expected, (long) Math.pow(1024, 3), (long) Math.pow(1024, 3));
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
         // When
@@ -56,8 +56,8 @@ public class MemoryMonitorServiceTest {
     @Test
     void getNonHeapMemoryUsage_WhenFormatted_ShouldReturnFormattedValue() {
         // Given
-        long expected = 600 * 1024 * 1024L;
-        MemoryUsage nonHeapMemoryUsage = new MemoryUsage(0L, expected, 1024 * 1024 * 1024L, 2048 * 1024 * 1024L);
+        long expected = 600 * (long) Math.pow(1024, 2);
+        MemoryUsage nonHeapMemoryUsage = new MemoryUsage(0L, expected, (long) Math.pow(1024, 3), (long) Math.pow(1024, 3));
         when(memoryMXBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 
         // When
@@ -70,8 +70,8 @@ public class MemoryMonitorServiceTest {
     @Test
     void getNonHeapMemoryUsage_WhenNotFormatted_ShouldReturnRawValue() {
         // Given
-        long expected = 600 * 1024 * 1024L;
-        MemoryUsage nonHeapMemoryUsage = new MemoryUsage(0L, expected, 1024 * 1024 * 1024L, 2048 * 1024 * 1024L);
+        long expected = 600 * (long) Math.pow(1024, 2);
+        MemoryUsage nonHeapMemoryUsage = new MemoryUsage(0L, expected, (long) Math.pow(1024, 3), (long) Math.pow(1024, 3));
         when(memoryMXBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 
         // When
@@ -84,8 +84,10 @@ public class MemoryMonitorServiceTest {
     @Test
     void getHeapMemoryMax_WhenFormatted_ShouldReturnFormattedValue() {
         // Given
-        long expected = 1024 * 1024 * 1024L;
-        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * 1024 * 1024L, 1024 * 1024 * 1024L, expected);
+        long max = (long) Math.pow(1024, 3);      // 1 GB
+        long committed = max;                      // Same as max
+        long used = 500 * (long) Math.pow(1024, 2); // 500 MB
+        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, used, committed, max);
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
         // When
@@ -98,23 +100,25 @@ public class MemoryMonitorServiceTest {
     @Test
     void getHeapMemoryMax_WhenNotFormatted_ShouldReturnRawValue() {
         // Given
-        long expected = 1024 * 1024 * 1024L;
-        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * 1024 * 1024L, 1024 * 1024 * 1024L, expected);
+        long max = (long) Math.pow(1024, 3);      // 1 GB
+        long committed = max;                      // Same as max
+        long used = 500 * (long) Math.pow(1024, 2); // 500 MB
+        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, used, committed, max);
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
         // When
         String formattedHeapMemoryMax = memoryMonitorService.getHeapMemoryMax(false);
 
         // Then
-        assertEquals(expected, Long.parseLong(formattedHeapMemoryMax));
+        assertEquals(max, Long.parseLong(formattedHeapMemoryMax));
     }
 
     
     @Test
     void getHeapMemoryCommitted_WhenFormatted_ShouldReturnFormattedValue() {
         // Given
-        long expected = 700 * 1024 * 1024L;
-        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * 1024 * 1024L, expected, 1024 * 1024 * 1024L);
+        long expected = 700 * (long) Math.pow(1024, 2);
+        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * (long) Math.pow(1024, 2), expected, (long) Math.pow(1024, 3));
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
         // When
@@ -127,8 +131,8 @@ public class MemoryMonitorServiceTest {
     @Test
     void getHeapMemoryCommitted_WhenNotFormatted_ShouldReturnRawValue() {
         // Given
-        long expected = 700 * 1024 * 1024L;
-        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * 1024 * 1024L, expected, 1024 * 1024 * 1024L);
+        long expected = 700 * (long) Math.pow(1024, 2);
+        MemoryUsage heapMemoryUsage = new MemoryUsage(0L, 500 * (long) Math.pow(1024, 2), expected, (long) Math.pow(1024, 3));
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
         // When
@@ -167,8 +171,8 @@ public class MemoryMonitorServiceTest {
     void getMemoryUtilisation_WhenUsedIsZero_ShouldReturnZero() {
         // Given 
         long used = 0L;
-        long committed = 1024 * 1024 * 1024L; // 1 GB
-        long max = 1024 * 1024 * 1024L; // 1 GB
+        long committed = (long) Math.pow(1024, 3); // 1 GB
+        long max = (long) Math.pow(1024, 3); // 1 GB
         MemoryUsage heapMemoryUsage = new MemoryUsage(0L, used, committed, max);
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
@@ -182,8 +186,8 @@ public class MemoryMonitorServiceTest {
     @Test
     void getMemoryUtilisation() {
         // Given 
-        long used = 512 * 1024 * 1024L; // 512 MB
-        long max = 1024 * 1024 * 1024L; // 1 GB
+        long used = 512 * (long) Math.pow(1024, 2); // 512 MB
+        long max = (long) Math.pow(1024, 3); // 1 GB
         MemoryUsage heapMemoryUsage = new MemoryUsage(0L, used, max, max);
         when(memoryMXBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
 
