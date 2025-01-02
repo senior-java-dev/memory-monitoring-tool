@@ -10,6 +10,16 @@ import com.jvsnr.util.MemoryUtils;
 
 @Service
 public class MemoryMonitorService {
+
+    private final MemoryMXBean memoryMXBean;
+
+    public MemoryMonitorService() {
+        this(ManagementFactory.getMemoryMXBean());
+    }
+
+    public MemoryMonitorService(MemoryMXBean memoryMXBean) {
+        this.memoryMXBean = memoryMXBean;
+    }
     
     /**
      * get heap memory usage
@@ -18,11 +28,10 @@ public class MemoryMonitorService {
      * @return heap memory usage in bytes
      */
     public String getHeapMemoryUsage(boolean formatted) {
-        MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
         if (formatted) {
-            return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getUsed());
+            return MemoryUtils.formatBytes(memoryMXBean.getHeapMemoryUsage().getUsed());
         } else {
-            return String.valueOf(memoryPoolMXBean.getHeapMemoryUsage().getUsed());
+            return String.valueOf(memoryMXBean.getHeapMemoryUsage().getUsed());
         }
     }
 
@@ -33,11 +42,10 @@ public class MemoryMonitorService {
      * @return non heap memory usage in bytes
      */
     public String getNonHeapMemoryUsage(boolean formatted) {
-        MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
         if (formatted) {
-            return MemoryUtils.formatBytes(memoryPoolMXBean.getNonHeapMemoryUsage().getUsed());
+            return MemoryUtils.formatBytes(memoryMXBean.getNonHeapMemoryUsage().getUsed());
         } else {
-            return String.valueOf(memoryPoolMXBean.getNonHeapMemoryUsage().getUsed());
+            return String.valueOf(memoryMXBean.getNonHeapMemoryUsage().getUsed());
         }
     }
 
@@ -48,11 +56,10 @@ public class MemoryMonitorService {
      * @return heap memory max in bytes
      */
     public String getHeapMemoryMax(boolean formatted) {
-        MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
         if (formatted) {
-            return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getMax());
+            return MemoryUtils.formatBytes(memoryMXBean.getHeapMemoryUsage().getMax());
         } else {
-            return String.valueOf(memoryPoolMXBean.getHeapMemoryUsage().getMax());
+            return String.valueOf(memoryMXBean.getHeapMemoryUsage().getMax());
         }
     }
 
@@ -63,11 +70,10 @@ public class MemoryMonitorService {
      * @return heap memory committed in bytes
      */
     public String getHeapMemoryCommitted(boolean formatted) {
-        MemoryMXBean memoryPoolMXBean = ManagementFactory.getMemoryMXBean();
         if (formatted) {
-            return MemoryUtils.formatBytes(memoryPoolMXBean.getHeapMemoryUsage().getCommitted());
+            return MemoryUtils.formatBytes(memoryMXBean.getHeapMemoryUsage().getCommitted());
         } else {
-            return String.valueOf(memoryPoolMXBean.getHeapMemoryUsage().getCommitted());
+            return String.valueOf(memoryMXBean.getHeapMemoryUsage().getCommitted());
         }
     }
 
@@ -77,10 +83,14 @@ public class MemoryMonitorService {
      * @return memory utilisation in percentage
      */
     public String getMemoryUtilisation() {
-        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
         long used = heapMemoryUsage.getUsed();
         long max = heapMemoryUsage.getMax();
+
+        if (max <= 0) {
+            return "0.0";
+        }
+
         float percentage = ((float) used / max) * 100;
         return Double.toString(percentage);
     }
