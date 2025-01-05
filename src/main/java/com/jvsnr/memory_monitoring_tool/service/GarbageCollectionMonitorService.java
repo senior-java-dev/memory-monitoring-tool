@@ -85,7 +85,7 @@ public class GarbageCollectionMonitorService {
      * 
      * @param gcInfo
      */
-    private void logGCEvent(GarbageCollectionNotificationInfo gcInfo) {
+    void logGCEvent(GarbageCollectionNotificationInfo gcInfo) {
         // Log important GC events, especially if they might indicate problems
         if (gcInfo.getGcInfo().getDuration() > 1000) { // GC took more than 1 second
             log.warn("Long GC pause detected: {} ms for collector {}", 

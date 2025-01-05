@@ -6,8 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -15,19 +19,26 @@ import static org.mockito.Mockito.withSettings;
 import java.lang.management.GarbageCollectorMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.Notification;
 import javax.management.NotificationEmitter;
+import javax.management.NotificationListener;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.jvsnr.memory_monitoring_tool.constant.GarbageCollectionType;
 import com.jvsnr.memory_monitoring_tool.dto.GarbageCollectionMetricsDTO;
+import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 
 @ExtendWith(MockitoExtension.class)
@@ -153,13 +164,23 @@ public class GarbageCollectionMonitorServiceTest {
 
         // When & Then
         assertEquals(GarbageCollectionType.YOUNG_GENERATION.name(), 
-                    gcMonitorService.determineGCType("PS Scavenge"));
+                    gcMonitorService.determineGCType("Young"));
+        assertEquals(GarbageCollectionType.YOUNG_GENERATION.name(), 
+                    gcMonitorService.determineGCType("Minor"));
         assertEquals(GarbageCollectionType.YOUNG_GENERATION.name(), 
                     gcMonitorService.determineGCType("Copy"));
+        assertEquals(GarbageCollectionType.YOUNG_GENERATION.name(), 
+                    gcMonitorService.determineGCType("PS Scavenge"));
+
         assertEquals(GarbageCollectionType.OLD_GENERATION.name(), 
-                    gcMonitorService.determineGCType("PS MarkSweep"));
+                    gcMonitorService.determineGCType("Old"));
+        assertEquals(GarbageCollectionType.OLD_GENERATION.name(), 
+                    gcMonitorService.determineGCType("Major"));
         assertEquals(GarbageCollectionType.OLD_GENERATION.name(), 
                     gcMonitorService.determineGCType("CMS"));
+        assertEquals(GarbageCollectionType.OLD_GENERATION.name(), 
+                    gcMonitorService.determineGCType("PS MarkSweep"));
+        
         assertEquals(GarbageCollectionType.UNKNOWN.name(), 
                     gcMonitorService.determineGCType("Unknown Collector"));
         assertEquals(GarbageCollectionType.UNKNOWN.name(), 
@@ -234,22 +255,70 @@ public class GarbageCollectionMonitorServiceTest {
         assertNotNull(metrics.get("PS MarkSweep").getGcOverhead());
     }
 
-    //----------------------
-
     @Test
-    void setUpGCMonitoring_ShouldHandleGCNotifications() {
+    void setUpGCMonitoring_ShouldRegisterNotificationListener() {
+        // Given
         GarbageCollectorMXBean youngGenBean = mock(GarbageCollectorMXBean.class, withSettings()
             .extraInterfaces(NotificationEmitter.class));
-        
+        NotificationEmitter emitter = (NotificationEmitter) youngGenBean;
         // when(youngGenBean.getName()).thenReturn("PS Scavenge");
-        // when(youngGenBean.getCollectionCount()).thenReturn(10L);
-        // when(youngGenBean.getCollectionTime()).thenReturn(100L);
         
+        ArgumentCaptor<NotificationListener> listenerCaptor = ArgumentCaptor.forClass(NotificationListener.class);
+        doNothing().when(emitter).addNotificationListener(listenerCaptor.capture(), isNull(), isNull());
+
         // When
         gcMonitorService = new GarbageCollectionMonitorService(Arrays.asList(youngGenBean));
 
         // Then
-        verify((NotificationEmitter)youngGenBean).addNotificationListener(any(), isNull(), isNull());
+        verify(emitter).addNotificationListener(any(), isNull(), isNull());
+        assertNotNull(listenerCaptor.getValue(), "Notification listener should be registered");
+    }
+
+    @Test
+    void updateGCMetrics_ShouldUpdateCollectionMetrics() {
+        // Given
+        GarbageCollectorMXBean youngGenBean = mock(GarbageCollectorMXBean.class);
+        when(youngGenBean.getName()).thenReturn("PS Scavenge");
+        when(youngGenBean.getCollectionCount()).thenReturn(1L);
+        when(youngGenBean.getCollectionTime()).thenReturn(200L);
+
+        gcMonitorService = new GarbageCollectionMonitorService(Arrays.asList(youngGenBean));
+
+        // When
+        Map<String, GarbageCollectionMetricsDTO> metrics = gcMonitorService.getGCMetricsByCollectionName();
+
+        // Then
+        assertNotNull(metrics.get("PS Scavenge"), "Metrics should exist for PS Scavenge");
+        GarbageCollectionMetricsDTO collectorMetrics = metrics.get("PS Scavenge");
+        assertEquals("PS Scavenge", collectorMetrics.getCollectionName());
+        assertEquals(1L, collectorMetrics.getCollectionCount());
+        assertEquals("200ms", collectorMetrics.getCollectionTime());
+    }
+
+    @Test
+    void setUpGCMonitoring_ShouldNotHandleNonGCNotifications() {
+        // Given
+        Notification notification = mock(Notification.class);
+        when(notification.getType()).thenReturn("some.non.gc.notification");
+
+        GarbageCollectorMXBean youngGenBean = mock(GarbageCollectorMXBean.class, withSettings()
+            .extraInterfaces(NotificationEmitter.class));
+        NotificationEmitter emitter = (NotificationEmitter) youngGenBean;
+        
+        // Capture the notification listener so we can trigger notifications
+        ArgumentCaptor<NotificationListener> listenerCaptor = ArgumentCaptor.forClass(NotificationListener.class);
+        doNothing().when(emitter).addNotificationListener(listenerCaptor.capture(), isNull(), isNull());
+
+        // When
+        gcMonitorService = spy(new GarbageCollectionMonitorService(Arrays.asList(youngGenBean)));
+        
+        // Trigger a non-GC notification
+        NotificationListener listener = listenerCaptor.getValue();
+        listener.handleNotification(notification, null);
+
+        // Then
+        verify(emitter).addNotificationListener(any(), isNull(), isNull());
+        verify(gcMonitorService, never()).logGCEvent(any());
     }
 
     @Test
