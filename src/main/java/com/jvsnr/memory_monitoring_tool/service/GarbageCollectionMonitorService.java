@@ -30,7 +30,11 @@ public class GarbageCollectionMonitorService {
     private Map<String, GarbageCollectionMetricsDTO> garbageCollectionMetrics;
 
     public GarbageCollectionMonitorService() {
-        this.garbageCollectorMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
+        this(ManagementFactory.getGarbageCollectorMXBeans());
+    }
+
+    public GarbageCollectionMonitorService(List<GarbageCollectorMXBean> garbageCollectorMXBeans) {
+        this.garbageCollectorMXBeans = garbageCollectorMXBeans;
         this.garbageCollectionMetrics = new HashMap<>();
         setUpGCMonitoring();
     }
@@ -130,6 +134,10 @@ public class GarbageCollectionMonitorService {
      * @return the type of garbage collection
      */
     public String determineGCType(String collectionName) {
+        if (collectionName == null) {
+            return GarbageCollectionType.UNKNOWN.name();
+        }
+        
         String lowercaseName = collectionName.toUpperCase();
         if (lowercaseName.contains(GarbageCollectorName.YOUNG.name()) || 
             lowercaseName.contains(GarbageCollectorName.MINOR.name()) || 
@@ -151,7 +159,7 @@ public class GarbageCollectionMonitorService {
      *
      * @return the garbage collection metrics by collection name
      */
-    public List<GarbageCollectionMetricsDTO> getGCMetricsByCollectionName() {
+    public Map<String, GarbageCollectionMetricsDTO> getGCMetricsByCollectionName() {
         for (GarbageCollectorMXBean gxBean: garbageCollectorMXBeans) {
             GarbageCollectionMetricsDTO gcMetrics = new GarbageCollectionMetricsDTO();
             gcMetrics.setCollectionName(gxBean.getName());
@@ -181,7 +189,7 @@ public class GarbageCollectionMonitorService {
             garbageCollectionMetrics.put(gcMetrics.getCollectionName(), gcMetrics);
         }
 
-        return (List<GarbageCollectionMetricsDTO>) garbageCollectionMetrics.values();
+        return garbageCollectionMetrics;
     }
 
 }

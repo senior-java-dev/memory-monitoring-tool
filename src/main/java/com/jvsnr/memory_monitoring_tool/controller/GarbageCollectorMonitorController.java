@@ -1,6 +1,6 @@
 package com.jvsnr.memory_monitoring_tool.controller;
 
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +41,7 @@ public class GarbageCollectorMonitorController {
     }
 
     @GetMapping("/metrics-by-coll-name")
-    public List<GarbageCollectionMetricsDTO> getGCMetricsByCollectionName() {
+    public Map<String, GarbageCollectionMetricsDTO> getGCMetricsByCollectionName() {
         return garbageCollectionMonitorService.getGCMetricsByCollectionName();
     }
 

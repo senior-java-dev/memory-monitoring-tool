@@ -1,6 +1,8 @@
 package com.jvsnr.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class MemoryUtils {
     
@@ -11,6 +13,10 @@ public class MemoryUtils {
      * @return formatted bytes
      */
     public static String formatBytes(long bytes) {
+        if (bytes <= 0) {
+            return "0 B";
+        }
+
         if (bytes < 1024) {
             return bytes + " B";
         } else if (bytes < Math.pow(1024, 2)) {
@@ -22,7 +28,7 @@ public class MemoryUtils {
         }
     }
 
-    public static long nullifyNegativeToZero(Long value) {
+    public static long nullifyNegativeToZero(long value) {
         if (value < 0) {
             return 0L;
         }
@@ -30,14 +36,26 @@ public class MemoryUtils {
     }
 
     public static String formatTime(long milliseconds) {
+        if (milliseconds <= 0) {
+            return "0ms";
+        }
+
         if (milliseconds < 1000) {
             return milliseconds + "ms";
         }
+
         return String.format("%.2fs", milliseconds / 1000.0);
     }
 
     public static String formatDateTime(long time) {
-        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time));
+        if (time <= 0) {
+            return "";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        return sdf.format(new Date(time));
     }
 
 }
