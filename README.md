@@ -136,3 +136,102 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For support, please open an issue in the GitHub repository or contact the maintainers.
+
+## FAQ: Understanding JVM Memory Monitoring
+
+### 1. What are the key JVM memory areas?
+
+The JVM memory is divided into several key areas:
+
+- **Heap Memory**
+  - Where all objects are allocated
+  - Divided into Young Generation (Eden + Survivor spaces) and Old Generation
+  - Size is controlled by `-Xmx` and `-Xms` flags
+
+- **Non-Heap Memory**
+  - **Metaspace**: Stores class metadata (replaced PermGen in Java 8+)
+  - **Code Cache**: Stores JIT-compiled code
+  - **Thread Stacks**: Each thread has its own stack for local variables and method calls
+
+### 2. How does garbage collection work?
+
+Garbage collection in the JVM follows a generational approach:
+
+1. **Young Generation Collection (Minor GC)**
+   - Most objects die young
+   - Eden space fills up first
+   - Surviving objects move to Survivor spaces
+   - Very fast and efficient
+
+2. **Old Generation Collection (Major GC)**
+   - Long-lived objects promoted from Young Generation
+   - Less frequent but more time-consuming
+   - Different algorithms available (G1, Parallel, ZGC, etc.)
+
+3. **Collection Process**
+   - Mark: Identify live objects
+   - Sweep: Remove dead objects
+   - Compact: Defragment memory (optional)
+
+### 3. What triggers an OutOfMemoryError?
+
+OutOfMemoryError occurs in several scenarios:
+
+- **Java Heap Space**
+  - Heap is full and no objects can be garbage collected
+  - Large object allocations with insufficient heap space
+  - Memory leaks preventing garbage collection
+
+- **Metaspace**
+  - Too many class definitions
+  - Dynamic class generation without cleanup
+
+- **Direct Memory**
+  - Native memory allocations exceed limits
+  - Common with NIO operations
+
+### 4. How do virtual threads differ from platform threads?
+
+Key differences between virtual and platform threads:
+
+- **Resource Usage**
+  - Platform threads: One-to-one mapping with OS threads
+  - Virtual threads: Many-to-few mapping (thousands of virtual threads on few platform threads)
+
+- **Memory Overhead**
+  - Platform threads: ~2MB stack size each
+  - Virtual threads: Very small stack (~1KB), dynamically sized
+
+- **Blocking Behavior**
+  - Platform threads: Blocking operations block OS threads
+  - Virtual threads: Blocking operations only block the virtual thread
+
+### 5. What metrics are most important for memory monitoring?
+
+Essential memory metrics to monitor:
+
+1. **Heap Usage**
+   - Current usage vs. maximum capacity
+   - Usage trends over time
+   - Percentage of heap used after full GC
+
+2. **Garbage Collection**
+   - Frequency of collections
+   - Duration of collections
+   - Types of collections (minor vs. major)
+
+3. **Memory Allocation Rate**
+   - How fast memory is being allocated
+   - Sudden spikes in allocation
+
+4. **Thread Memory**
+   - Number of active threads
+   - Thread stack usage
+   - Thread creation/termination rates
+
+5. **Non-Heap Memory**
+   - Metaspace usage
+   - Code cache size
+   - Direct buffer pool usage
+
+This tool helps monitor these metrics and provides alerts when potential issues are detected.
